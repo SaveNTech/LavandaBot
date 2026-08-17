@@ -61,7 +61,7 @@ cp .env.example .env
 | `TP_BOT_TOKEN` | токен админ-бота парсера |
 | `TP_API_ID` / `TP_API_HASH` | Telegram API-креды юзер-аккаунта (my.telegram.org) |
 | `TP_SESSION_NAME` | имя файла сессии pyrogram (по умолчанию `parser_session`) |
-| `TP_MAIN_CHAT` / `TP_ERROR_CHAT` | служебные чаты парсера |
+| `TP_ERROR_CHAT` | чат, куда падают ошибки юзербота |
 
 ### 3. Сборка и первый запуск
 
@@ -110,3 +110,7 @@ docker compose up -d
   первый же запрос падал бы `UndefinedTableError`. Раскомментировано.
 - `req.txt` в обоих репозиториях лежал в UTF-16 (артефакт `pip freeze` на Windows) —
   пересохранён в UTF-8 для надёжной сборки образов.
+- **`MAIN_CHAT` убран.** Переменная читалась на уровне модуля (`int(os.getenv("MAIN_CHAT"))`)
+  и без неё юзербот падал при импорте, хотя значение нигде не использовалось — реальная
+  логика назначения целевой группы полностью на БД (город источника → `target_group.group_id`).
+  Мёртвый код (`chat_id`, `save_album_after_delay`) удалён из `group_handler.py`.

@@ -56,7 +56,6 @@ services:
       API_ID: ${TP_API_ID}
       API_HASH: ${TP_API_HASH}
       SESSION_NAME: ${TP_SESSION_NAME}
-      MAIN_CHAT: ${TP_MAIN_CHAT}
       ERROR_CHAT: ${TP_ERROR_CHAT}
     volumes:
       - parser_data:/data
