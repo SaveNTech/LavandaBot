@@ -1,0 +1,66 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  helper-bot:
+    build: ./HelperChatBotManager
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      BOT_TOKEN: ${HCM_BOT_TOKEN}
+      ERROR_CHAT_ID: ${HCM_ERROR_CHAT_ID}
+      YOOTOKEN: ${HCM_YOOTOKEN}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+
+  parser-bot:
+    build: ./TelegramParser
+    command: ["python", "/app/main_bot.py"]
+    working_dir: /data
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${TP_BOT_TOKEN}
+    volumes:
+      - parser_data:/data
+
+  # First run needs an interactive login (phone number + OTP + optional 2FA password):
+  #   docker compose run --rm parser-userbot
+  # Once sessions/ has a valid session file (persisted in parser_data), normal
+  # detached startup via `docker compose up -d` works without any prompts.
+  parser-userbot:
+    build: ./TelegramParser
+    command: ["python", "/app/main_userbot_linux.py"]
+    working_dir: /data
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    environment:
+      API_ID: ${TP_API_ID}
+      API_HASH: ${TP_API_HASH}
+      SESSION_NAME: ${TP_SESSION_NAME}
+      MAIN_CHAT: ${TP_MAIN_CHAT}
+      ERROR_CHAT: ${TP_ERROR_CHAT}
+    volumes:
+      - parser_data:/data
+
+volumes:
+  pg_data:
+  parser_data:
