@@ -60,6 +60,12 @@ services:
     volumes:
       - parser_data:/data
 
+  ads-bot:
+    build: ./LavandaAds
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${ADS_BOT_TOKEN}
+
 volumes:
   pg_data:
   parser_data:

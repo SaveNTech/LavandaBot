@@ -14,6 +14,7 @@
 | `helper-bot` | [HelperChatBotManager](https://github.com/SaveNTech/HelperChatBotManager) | aiogram | Postgres | Модерация групп-классифайдов: проверяет оплаченный доступ (`ads_limit`) перед тем как разрешить пользователю написать объявление, приём оплат через ЮKassa, стоп-слова, автоудаление отказных сообщений |
 | `parser-bot` | [TelegramParser](https://github.com/SaveNTech/TelegramParser) — `main_bot.py` | aiogram | SQLite (`tg_parser.db`) | Админ-панель: группы-источники, целевые группы по городам, категории/ключевые слова |
 | `parser-userbot` | [TelegramParser](https://github.com/SaveNTech/TelegramParser) — `main_userbot_linux.py` | pyrogram (`pyrotgfork`) | SQLite (`tg_parser.db`, общий с `parser-bot`) | Слушает группы-источники под юзер-аккаунтом, фильтрует по стоп-словам и репостит в целевую группу нужного города |
+| `ads-bot` | [LavandaAds](https://github.com/SaveNTech/LavandaAds) | aiogram | — | Статичный бот с прайсом на рекламу в сети чатов, без БД |
 
 `parser-bot` и `parser-userbot` собираются из одного образа (`TelegramParser/Dockerfile`),
 различается только команда запуска.
@@ -25,6 +26,7 @@ git clone <url-этого-репозитория> LavandaBot
 cd LavandaBot
 git clone https://github.com/SaveNTech/HelperChatBotManager
 git clone https://github.com/SaveNTech/TelegramParser
+git clone https://github.com/SaveNTech/LavandaAds
 ```
 
 ### 1. Локальные конфиги, которые не хранятся в git
@@ -62,6 +64,7 @@ cp .env.example .env
 | `TP_API_ID` / `TP_API_HASH` | Telegram API-креды юзер-аккаунта (my.telegram.org) |
 | `TP_SESSION_NAME` | имя файла сессии pyrogram (по умолчанию `parser_session`) |
 | `TP_ERROR_CHAT` | чат, куда падают ошибки юзербота |
+| `ADS_BOT_TOKEN` | токен бота с прайсом на рекламу |
 
 ### 3. Сборка и первый запуск
 
@@ -114,3 +117,5 @@ docker compose up -d
   и без неё юзербот падал при импорте, хотя значение нигде не использовалось — реальная
   логика назначения целевой группы полностью на БД (город источника → `target_group.group_id`).
   Мёртвый код (`chat_id`, `save_album_after_delay`) удалён из `group_handler.py`.
+- **Добавлен `LavandaAds`.** В репозитории не было ни `requirements.txt`, ни `Dockerfile` —
+  добавлены. Заодно убраны случайно закоммиченные `__pycache__/*.pyc` и `.idea/`.
