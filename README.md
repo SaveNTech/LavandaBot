@@ -60,6 +60,7 @@ cp .env.example .env
 | `HCM_BOT_TOKEN` | токен бота-модератора чатов |
 | `HCM_ERROR_CHAT_ID` | чат, куда падают ошибки HelperChatBotManager |
 | `HCM_YOOTOKEN` | provider token ЮKassa для приёма оплат |
+| `HCM_MODERATION_CHAT_ID` | чат, куда приходят заявки на объявления (кнопки Разрешить/Отклонить) |
 | `TP_BOT_TOKEN` | токен админ-бота парсера |
 | `TP_API_ID` / `TP_API_HASH` | Telegram API-креды юзер-аккаунта (my.telegram.org) |
 | `TP_SESSION_NAME` | имя файла сессии pyrogram (по умолчанию `parser_session`) |
@@ -119,3 +120,7 @@ docker compose up -d
   Мёртвый код (`chat_id`, `save_album_after_delay`) удалён из `group_handler.py`.
 - **Добавлен `LavandaAds`.** В репозитории не было ни `requirements.txt`, ни `Dockerfile` —
   добавлены. Заодно убраны случайно закоммиченные `__pycache__/*.pyc` и `.idea/`.
+- **Прямой постинг в группы заменён на подачу через бота с модерацией.** Группы теперь
+  publish-only, объявление подаётся в личке боту (`/start` → «Подать объявление»),
+  публикация — только после ✅/❌ модератора в отдельном чате (`HCM_MODERATION_CHAT_ID`).
+  `ads_limit` списывается только при одобрении.
