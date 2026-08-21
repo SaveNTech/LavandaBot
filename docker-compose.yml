@@ -48,7 +48,9 @@ services:
   # detached startup via `docker compose up -d` works without any prompts.
   parser-userbot:
     build: ./TelegramParser
-    command: ["python", "/app/main_userbot_linux.py"]
+    # pyrogram (workdir="sessions") ждёт, что папка sessions/ уже существует,
+    # сам её не создаёт - на пустом volume падает sqlite3.OperationalError
+    command: ["sh", "-c", "mkdir -p sessions && python /app/main_userbot_linux.py"]
     working_dir: /data
     restart: unless-stopped
     stdin_open: true
